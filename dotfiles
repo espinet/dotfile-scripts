@@ -1,5 +1,12 @@
+!#/bin/sh
+
+mv_file_and_folder() {
+  mkdir -p ~/.dotfiles-backup/$(dirname $1)/
+  mv $1 ~/.dotfiles-backup/$(dirname $1)/
+}
+export -f mv_file_and_folder
+
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-echo ".dotfiles" >> .gitignore
 git clone --bare https://github.com/espinet/dotfiles.git $HOME/.dotfiles
 function config {
    /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@
@@ -13,7 +20,7 @@ if [ $? = 0 ]; then
     config checkout 2>&1 |
       egrep "\s+\." |
       awk {'print $1'} |
-      xargs -I{} bash -c "mkdir -p ~/.dotfiles-backup/$(dirname {})/ && mv {} ~/.dotfiles-backup/$(dirname {})/"
+      xargs -tI{} bash -c "mv_file_and_folder {}"
 fi;
 config checkout
 config config status.showUntrackedFiles no
